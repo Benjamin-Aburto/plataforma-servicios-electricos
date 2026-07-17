@@ -1,10 +1,7 @@
-- name: Deploy to ECS
+- name: Desplegar en ECS
         run: |
-          # Esto registra la tarea usando el JSON que ya está en tu repositorio
+          # Esto registra la nueva versión de tu tarea automáticamente
           aws ecs register-task-definition --cli-input-json file://deploy/task-definition.json
           
-          # Esto actualiza el servicio para que use la nueva imagen
-          aws ecs update-service --cluster cluster-servicios-electricos \
-            --service contact-service-run \
-            --task-definition contact-service-task \
-            --force-new-deployment
+          # Esto actualiza tu servicio (si no existe, lo crearemos una sola vez)
+          aws ecs update-service --cluster cluster-servicios-electricos --service contact-service-run --task-definition contact-service-task --force-new-deployment
