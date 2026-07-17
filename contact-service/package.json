@@ -1,0 +1,15 @@
+{
+  "name": "contact-service",
+  "version": "1.0.0",
+  "description": "Microservicio que recibe el formulario de contacto, lo guarda en MySQL y notifica a notification-service",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0"
+  }
+}
