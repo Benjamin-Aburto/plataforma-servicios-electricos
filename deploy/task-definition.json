@@ -1,7 +1,7 @@
 {
   "family": "contact-service-task",
   "networkMode": "awsvpc",
-  "executionRoleArn": "arn:aws:iam::169917473443:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::169917473443:role/LabRole",
   "containerDefinitions": [
     {
       "name": "contact-service",
