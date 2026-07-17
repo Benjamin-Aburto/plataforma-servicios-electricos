@@ -8,67 +8,20 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4
-
-      - name: Configurar credenciales AWS
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: us-east-1
-
-      - name: Login a Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Definir tag de imagen
-        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
-
-      # ---------- FRONTEND ----------
-      - name: Build & push FRONTEND
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          cd frontend
-          docker build -t $ECR_REGISTRY/frontend:${IMAGE_TAG} -t $ECR_REGISTRY/frontend:latest .
-          docker push $ECR_REGISTRY/frontend --all-tags
-
-      # ---------- CONTACT SERVICE ----------
+      - uses: aws-actions/amazon-ecr-login@v2
+      
+      # Forzamos la ejecución de npm install en lugar de ci
       - name: Build & push CONTACT SERVICE
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           cd contact-service
-          docker build -t $ECR_REGISTRY/contact-service:${IMAGE_TAG} -t $ECR_REGISTRY/contact-service:latest .
-          docker push $ECR_REGISTRY/contact-service --all-tags
-
-      # ---------- PORTFOLIO SERVICE ----------
-      - name: Build & push PORTFOLIO SERVICE
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          cd portfolio-service
-          docker build -t $ECR_REGISTRY/portfolio-service:${IMAGE_TAG} -t $ECR_REGISTRY/portfolio-service:latest .
-          docker push $ECR_REGISTRY/portfolio-service --all-tags
-
-      # ---------- NOTIFICATION SERVICE ----------
-      - name: Build & push NOTIFICATION SERVICE
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          cd notification-service
-          docker build -t $ECR_REGISTRY/notification-service:${IMAGE_TAG} -t $ECR_REGISTRY/notification-service:latest .
-          docker push $ECR_REGISTRY/notification-service --all-tags
-
-      # ---------- DATABASE ----------
-      - name: Build & push DATABASE
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          cd database
-          docker build -t $ECR_REGISTRY/database:${IMAGE_TAG} -t $ECR_REGISTRY/database:latest .
-          docker push $ECR_REGISTRY/database --all-tags
+          sed -i 's/npm ci/npm install/g' Dockerfile
+          docker build -t 169917473443.dkr.ecr.us-east-1.amazonaws.com/contact-service:latest .
+          docker push 169917473443.dkr.ecr.us-east-1.amazonaws.com/contact-service:latest
