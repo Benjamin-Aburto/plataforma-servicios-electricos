@@ -1,27 +1,10 @@
-name: CI/CD Servicios Electricos a AWS ECS
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch: {}
-
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: us-east-1
-      - uses: aws-actions/amazon-ecr-login@v2
-      
-      # Forzamos la ejecución de npm install en lugar de ci
-      - name: Build & push CONTACT SERVICE
+- name: Deploy to ECS
         run: |
-          cd contact-service
-          sed -i 's/npm ci/npm install/g' Dockerfile
-          docker build -t 169917473443.dkr.ecr.us-east-1.amazonaws.com/contact-service:latest .
-          docker push 169917473443.dkr.ecr.us-east-1.amazonaws.com/contact-service:latest
+          # Esto registra la tarea usando el JSON que ya está en tu repositorio
+          aws ecs register-task-definition --cli-input-json file://deploy/task-definition.json
+          
+          # Esto actualiza el servicio para que use la nueva imagen
+          aws ecs update-service --cluster cluster-servicios-electricos \
+            --service contact-service-run \
+            --task-definition contact-service-task \
+            --force-new-deployment
