@@ -6,6 +6,7 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 COPY package*.json ./
+# Actualizado: Forzar instalacion limpia
 RUN npm install --omit=dev
 
 COPY src ./src
